@@ -203,52 +203,33 @@ export default function HomePage() {
           </Card>
         </div>
 
-        {/* 主内容区 */}
-        <Tabs defaultValue="teams" className="space-y-4">
-          <TabsList className="bg-[hsl(var(--card))] border p-1 gap-1">
-            <TabsTrigger
-              value="teams"
-              className="data-[state=active]:bg-[hsl(var(--primary))] data-[state=active]:text-white"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Agent Teams
-            </TabsTrigger>
-            <TabsTrigger
-              value="conversations"
-              className="data-[state=active]:bg-[hsl(var(--primary))] data-[state=active]:text-white"
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              历史对话
-            </TabsTrigger>
-            <TabsTrigger
-              value="byproject"
-              className="data-[state=active]:bg-[hsl(var(--primary))] data-[state=active]:text-white"
-            >
-              <FolderOpen className="h-4 w-4 mr-2" />
-              按项目
-            </TabsTrigger>
-          </TabsList>
+        {/* 主内容区: Dashboard 概览 */}
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* 最近活动团队 */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b pb-2">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Users className="h-5 w-5 text-blue-500" />
+                最近活跃团队
+              </h2>
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/teams" className="text-sm">查看全部 &rarr;</a>
+              </Button>
+            </div>
 
-          <TabsContent value="teams" className="space-y-4">
             {loading ? (
-              <div className="flex items-center justify-center py-20">
-                <RefreshCw className="h-8 w-8 animate-spin text-[hsl(var(--muted-foreground))]" />
+              <div className="flex items-center justify-center py-10">
+                <RefreshCw className="h-6 w-6 animate-spin text-[hsl(var(--muted-foreground))]" />
               </div>
             ) : teams.length === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-20">
-                  <div className="p-4 rounded-full bg-[hsl(var(--secondary))] mb-4">
-                    <Users className="h-10 w-10 text-[hsl(var(--muted-foreground))]" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">暂无 Agent Teams</h3>
-                  <p className="text-sm text-[hsl(var(--muted-foreground))] text-center max-w-md">
-                    使用 Claude Code 创建团队后，它们将显示在这里。
-                  </p>
+              <Card className="border-dashed bg-transparent">
+                <CardContent className="flex flex-col items-center justify-center py-10">
+                  <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无执行任务的团队</p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {teams.map((team) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {teams.slice(0, 4).map((team) => (
                   <TeamCard
                     key={team.config.name}
                     team={team}
@@ -257,60 +238,60 @@ export default function HomePage() {
                 ))}
               </div>
             )}
-          </TabsContent>
+          </div>
 
-          <TabsContent value="conversations" className="space-y-4">
+          {/* 最近全局对话历史 */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b pb-2">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-primary" />
+                最近对话历史
+              </h2>
+              <Button variant="ghost" size="sm" asChild>
+                <a href="/conversations" className="text-sm">查看全部 &rarr;</a>
+              </Button>
+            </div>
+
             {conversations.length === 0 ? (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-20">
-                  <div className="p-4 rounded-full bg-[hsl(var(--secondary))] mb-4">
-                    <MessageSquare className="h-10 w-10 text-[hsl(var(--muted-foreground))]" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">暂无历史对话</h3>
-                  <p className="text-sm text-[hsl(var(--muted-foreground))] text-center max-w-md">
-                    与 Claude Code 的对话历史将显示在这里。
-                  </p>
+              <Card className="border-dashed bg-transparent">
+                <CardContent className="flex flex-col items-center justify-center py-10">
+                  <p className="text-sm text-[hsl(var(--muted-foreground))]">暂无对话历史</p>
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-4">
-                {conversations.map((conv) => (
+              <div className="grid gap-3">
+                {conversations.slice(0, 3).map((conv) => (
                   <Card key={conv.id} className="card-hover">
-                    <CardHeader>
+                    <CardHeader className="py-3 px-4">
                       <div className="flex items-start justify-between">
                         <div>
-                          <CardTitle className="text-lg">{conv.title || conv.id}</CardTitle>
-                          <CardDescription>
+                          <CardTitle className="text-base truncate max-w-[200px] md:max-w-xs">{conv.title || conv.projectName || conv.id}</CardTitle>
+                          <CardDescription className="text-xs mt-0.5">
                             <Clock className="h-3 w-3 inline mr-1" />
-                            {new Date(conv.createdAt).toLocaleString('zh-CN')}
+                            {new Date(conv.updatedAt).toLocaleString('zh-CN')}
                           </CardDescription>
                         </div>
-                        <Badge variant="secondary">
-                          {conv.messages?.length || 0} 条消息
+                        <Badge variant="secondary" className="text-xs">
+                          {conv.messageCount || (conv.messages?.length || 0)} 条消息
                         </Badge>
                       </div>
                     </CardHeader>
                     {conv.messages && conv.messages.length > 0 && (
-                      <CardContent>
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
-                          {conv.messages.slice(-3).map((msg: any, idx: number) => (
+                      <CardContent className="py-2 px-4 pb-4">
+                        <div className="space-y-2 overflow-hidden">
+                          {conv.messages.slice(-2).map((msg: any, idx: number) => (
                             <div
                               key={idx}
-                              className={`p-3 rounded-lg ${
-                                msg.role === 'user'
-                                  ? 'bg-[hsl(var(--primary))]/10 ml-8'
-                                  : 'bg-[hsl(var(--secondary))] mr-8'
-                              }`}
+                              className={`p-2 rounded-lg ${msg.role === 'user'
+                                  ? 'bg-[hsl(var(--primary))]/10 ml-6'
+                                  : 'bg-[hsl(var(--secondary))] mr-6'
+                                }`}
                             >
-                              <div className="text-xs font-medium mb-1 flex items-center gap-1">
-                                {msg.role === 'user' ? (
-                                  <><Users className="h-3 w-3" /> 你</>
-                                ) : (
-                                  <><Bot className="h-3 w-3" /> Claude</>
-                                )}
+                              <div className="text-[10px] font-medium mb-1 opacity-70">
+                                {msg.role === 'user' ? '你' : 'Claude'}
                               </div>
-                              <div className="text-sm line-clamp-2">
-                                {msg.content?.slice(0, 150)}...
+                              <div className="text-xs line-clamp-1">
+                                {msg.content}
                               </div>
                             </div>
                           ))}
@@ -321,12 +302,8 @@ export default function HomePage() {
                 ))}
               </div>
             )}
-          </TabsContent>
-
-          <TabsContent value="byproject" className="space-y-4">
-            <ProjectConversations />
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </main>
 
       <TeamDetailDialog

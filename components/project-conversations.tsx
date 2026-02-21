@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { FolderOpen, MessageSquare, Clock, Loader2, ChevronRight } from 'lucide-react'
 import { ConversationDetailDialog } from './conversation-detail-dialog'
+import Link from 'next/link'
 
 interface ProjectConversations {
   projectName: string
@@ -128,23 +129,25 @@ export function ProjectConversations() {
                   key={project.projectName}
                   variant={selectedProject === project.projectName ? 'secondary' : 'ghost'}
                   className="w-full justify-start text-left h-auto py-2 px-3"
-                  onClick={() => setSelectedProject(project.projectName)}
+                  asChild
                 >
-                  <div className="flex items-center gap-2 w-full">
-                    <FolderOpen className="h-4 w-4 shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate">
-                        {formatProjectName(project.projectName)}
+                  <Link href={`/projects/${encodeURIComponent(project.projectName)}`}>
+                    <div className="flex items-center gap-2 w-full">
+                      <FolderOpen className="h-4 w-4 shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">
+                          {formatProjectName(project.projectName)}
+                        </div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-2">
+                          <MessageSquare className="h-3 w-3" />
+                          {project.conversations.length} 会话
+                          <span className="text-muted-foreground/50">•</span>
+                          {project.totalMessages} 消息
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2">
-                        <MessageSquare className="h-3 w-3" />
-                        {project.conversations.length} 会话
-                        <span className="text-muted-foreground/50">•</span>
-                        {project.totalMessages} 消息
-                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  </div>
+                  </Link>
                 </Button>
               ))}
             </div>

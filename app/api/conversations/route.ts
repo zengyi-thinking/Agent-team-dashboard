@@ -137,6 +137,31 @@ async function getProjectConversations(projectName: string): Promise<Conversatio
   return conversations
 }
 
+// 获取全局历史对话记录
+async function getGlobalConversations(): Promise<Conversation | null> {
+  const historyFilePath = path.join(homedir(), '.claude', 'history.jsonl')
+  try {
+    const messages = await parseJsonlFile(historyFilePath)
+    if (messages.length > 0) {
+      const timestamps = messages.map(m => m.timestamp || 0).filter(t => t > 0)
+      return {
+        id: 'global-history',
+        title: '全局历史对话 (history.jsonl)',
+        projectName: '无特定项目',
+        sessionId: 'global',
+        createdAt: Math.min(...timestamps) || Date.now(),
+        updatedAt: Math.max(...timestamps) || Date.now(),
+        messageCount: messages.length,
+        firstMessage: messages[0]?.content?.slice(0, 100),
+        messages: messages.slice(-50), // 取最新的50条返回展示
+      }
+    }
+  } catch (error) {
+    console.error('Error reading global history:', error)
+  }
+  return null
+}
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -183,6 +208,12 @@ export async function GET(request: Request) {
     // 默认返回所有对话（扁平化）
     const projectNames = await getProjectList()
     const allConversations: Conversation[] = []
+
+    // 尝试加入全局历史
+    const globalConv = await getGlobalConversations()
+    if (globalConv && globalConv.messageCount > 0) {
+      allConversations.push(globalConv)
+    }
 
     for (const projectName of projectNames) {
       const conversations = await getProjectConversations(projectName)
