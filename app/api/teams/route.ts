@@ -56,8 +56,8 @@ export async function GET() {
           taskCount,
           lastActivity,
         })
-      } catch (error) {
-        console.error(`Error reading team ${dir.name}:`, error)
+      } catch {
+        // 目录存在但不是有效的团队配置，跳过
       }
     }
 

@@ -90,8 +90,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       }
 
       ws.onerror = (error) => {
-        console.error('WebSocket error:', error)
-        toast.error('WebSocket连接错误')
+        // WebSocket 错误通常是正常的（服务器未启动），只在开发模式下输出
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('WebSocket server not running - this is normal in development mode')
+        }
+        // 不再显示 toast 错误，因为 WebSocket 是可选功能
       }
 
       ws.onclose = () => {

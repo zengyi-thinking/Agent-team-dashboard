@@ -15,6 +15,11 @@ import {
   Activity,
   ChevronLeft,
   ChevronRight,
+  Cpu,
+  Puzzle,
+  Wrench,
+  Plug,
+  Command,
 } from 'lucide-react'
 
 interface NavItem {
@@ -34,6 +39,31 @@ const navItems: NavItem[] = [
     title: 'Agent Teams',
     href: '/teams',
     icon: Users,
+  },
+  {
+    title: '智能体',
+    href: '/agents',
+    icon: Cpu,
+  },
+  {
+    title: 'MCP 服务',
+    href: '/mcp',
+    icon: Puzzle,
+  },
+  {
+    title: '技能中心',
+    href: '/skills',
+    icon: Wrench,
+  },
+  {
+    title: '插件',
+    href: '/plugins',
+    icon: Plug,
+  },
+  {
+    title: '命令',
+    href: '/commands',
+    icon: Command,
   },
   {
     title: '历史对话',
